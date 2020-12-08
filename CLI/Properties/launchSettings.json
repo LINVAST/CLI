@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "ast -v Samples.Imperative.AST/sample.c"
+    }
+  }
+}
