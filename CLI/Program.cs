@@ -103,7 +103,7 @@ namespace LINVAST.Cli
 
         private static void SetupLogger(bool verbose)
         {
-            LoggerConfiguration lcfg = new LoggerConfiguration()
+            var lcfg = new LoggerConfiguration()
                 .WriteTo.Console(outputTemplate: "\r[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .Enrich.FromLogContext()
                 ;
