@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+source "${SCRIPT_DIR}/scripts/common"
+
+usage() {
+    cat <<'USAGE'
+Usage: ./run [options] [-- <linvast args>]
+
+Options:
+  -c, --configuration <Debug|Release>  Run configuration. Default: Debug.
+      --no-restore                     Skip dotnet restore.
+      --no-build                       Skip build before running.
+  -h, --help                           Show this help text.
+USAGE
+}
+
+configuration="Debug"
+no_restore=0
+no_build=0
+app_args=()
+
+while (($#)); do
+    case "$1" in
+        -c|--configuration)
+            shift
+            cli_require_value "--configuration" "${1-}"
+            configuration="$1"
+            ;;
+        --no-restore)
+            no_restore=1
+            ;;
+        --no-build)
+            no_build=1
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            app_args+=("$@")
+            break
+            ;;
+        -*)
+            cli_die "unknown option '$1'"
+            ;;
+        *)
+            app_args+=("$@")
+            break
+            ;;
+    esac
+    shift
+done
+
+cli_validate_configuration "$configuration"
+
+cd "$CLI_REPO_ROOT"
+cli_prepare_nuget_config
+trap cli_restore_nuget_config EXIT
+
+if [[ "$no_build" -eq 0 && "$no_restore" -eq 0 ]]; then
+    dotnet restore "$CLI_PROJECT" -v minimal -m:1
+fi
+
+run_args=(dotnet run --project "$CLI_PROJECT" --configuration "$configuration" --no-restore)
+
+if [[ "$no_build" -eq 1 ]]; then
+    run_args+=(--no-build)
+fi
+
+run_args+=(-- "${app_args[@]}")
+
+"${run_args[@]}"

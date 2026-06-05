@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+CLI_COMMON_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+CLI_REPO_ROOT="$(cd -- "${CLI_COMMON_DIR}/.." && pwd -P)"
+CLI_SOLUTION="${CLI_REPO_ROOT}/CLI.sln"
+CLI_PROJECT="${CLI_REPO_ROOT}/CLI/CLI.csproj"
+CLI_COPIED_NUGET_CONFIG=""
+
+cli_die() {
+    printf 'error: %s\n' "$*" >&2
+    exit 1
+}
+
+cli_require_value() {
+    local option="$1"
+    local value="${2-}"
+
+    if [[ -z "$value" ]]; then
+        cli_die "${option} requires a value"
+    fi
+}
+
+cli_validate_configuration() {
+    local configuration="$1"
+
+    case "$configuration" in
+        Debug|Release)
+            ;;
+        *)
+            cli_die "invalid configuration '${configuration}'. Must be Debug or Release"
+            ;;
+    esac
+}
+
+cli_prepare_nuget_config() {
+    local source_config=""
+    local target_config="${CLI_REPO_ROOT}/NuGet.config"
+
+    if [[ -f "${CLI_REPO_ROOT}/.nuget/NuGet.config" ]]; then
+        source_config="${CLI_REPO_ROOT}/.nuget/NuGet.config"
+    elif [[ -f "${CLI_REPO_ROOT}/.nuget/Nuget.config" ]]; then
+        source_config="${CLI_REPO_ROOT}/.nuget/Nuget.config"
+    fi
+
+    if [[ -z "$source_config" || -f "$target_config" ]]; then
+        return 0
+    fi
+
+    cp "$source_config" "$target_config"
+    CLI_COPIED_NUGET_CONFIG="$target_config"
+}
+
+cli_restore_nuget_config() {
+    if [[ -n "${CLI_COPIED_NUGET_CONFIG:-}" && -f "$CLI_COPIED_NUGET_CONFIG" ]]; then
+        rm -f "$CLI_COPIED_NUGET_CONFIG"
+    fi
+}

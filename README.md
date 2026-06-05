@@ -5,6 +5,68 @@
 
 ## Examples
 
+## Development
+
+Build locally:
+
+```sh
+./build --configuration Debug
+```
+
+Run the CLI without installing it:
+
+```sh
+./run -- ast Samples.Imperative.AST/sample.c
+```
+
+Use `--no-build` after an existing build:
+
+```sh
+./run --no-build -- ast Samples.Imperative.AST/sample.lua --format text
+```
+
+## Usage
+
+Generate an AST as JSON:
+
+```sh
+linvast ast path/to/source.c
+```
+
+Generate compact JSON from stdin. Stdin requires an explicit language:
+
+```sh
+printf 'int x = 1;' | linvast ast - --language c --compact
+```
+
+Write AST text instead of JSON:
+
+```sh
+linvast ast path/to/source.lua --format text
+```
+
+Write node statistics to stderr:
+
+```sh
+linvast ast path/to/source.go --stats
+```
+
+Compare two source files:
+
+```sh
+linvast cmp reference.c candidate.c
+```
+
+Useful options:
+
+- `--language, -l`: language or extension override. Supported values include `c`, `go`, `java`, `lua`, and `psc`.
+- `--output, -o`: write AST output to a file. Missing directories are created.
+- `--format, -f`: `json` or `text`.
+- `--compact, -c`: emit compact JSON.
+- `--stats`: write AST node statistics to stderr.
+- `--quiet, -q`: only write errors.
+- `--verbose, -v`: write detailed diagnostics.
+
 ### Creating common AST
 
 Source codes which show supported syntax constructs in one place for various programming languages can be found in the ![Samples.Imperative.AST](Samples.Imperative.AST/) directory. Several examples will be shown below.
