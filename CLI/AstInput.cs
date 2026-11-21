@@ -41,6 +41,8 @@ namespace LINVAST.Cli
                 ".java" => new Imperative.Builders.Java.JavaASTBuilder(),
                 ".lua" => new Imperative.Builders.Lua.LuaASTBuilder(),
                 ".psc" => new Imperative.Builders.Pseudo.PseudoASTBuilder(),
+                ".kt" or ".kts" => new Imperative.Builders.Kotlin.KotlinASTBuilder(),
+                ".py" => new Imperative.Builders.Python.PythonASTBuilder(),
                 _ => throw new UnsupportedLanguageException(),
             };
 
@@ -60,6 +62,8 @@ namespace LINVAST.Cli
                 "java" => ".java",
                 "lua" => ".lua",
                 "psc" or "pseudo" => ".psc",
+                "kotlin" or "kt" or "kts" => ".kt",
+                "python" or "py" => ".py",
                 _ => "." + normalized,
             };
         }

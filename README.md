@@ -478,3 +478,25 @@ $ linvast cmp Samples/swap/valid.c Samples/swap/refactor.c
 ```
 
 ![swap](Samples.Imperative.Comparers/swap/valid_c-refactor_c.PNG)
+
+## LINVAST dependency selection
+
+Builds use exactly **3.0.0** of each required LINVAST NuGet package by default,
+even when a neighboring source checkout exists. This applies to Debug and Release.
+
+Opt into the neighboring `LINVAST` source checkout for development:
+
+```sh
+dotnet build CLI/CLI.csproj -p:UseLocalLinvast=true
+```
+
+Local mode requires all referenced projects at their existing relative paths and
+fails clearly if any are missing. It uses checkout changes directly without a
+package version pin. Use `-p:UseLocalLinvast=false` to explicitly select packages.
+
+Use the same property for `dotnet run` or `dotnet publish`. If restoring separately,
+pass the same selection to both restore and build/publish; restore again when
+switching dependency modes before using `--no-restore`.
+
+For the wrapper scripts, use `UseLocalLinvast=true ./build` or
+`UseLocalLinvast=true ./run`. The `./publish` script always uses pinned packages.
